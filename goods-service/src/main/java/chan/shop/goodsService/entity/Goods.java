@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 public class Goods {
     @Id
     private Long goodsId;
-    @Column(nullable = false, length = 100, unique = true)
+    @Column(nullable = false, length = 100)
     private String goodsTitle;
     @Column(nullable = false, length = 3000)
     private String goodsContent;
