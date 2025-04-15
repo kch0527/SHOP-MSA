@@ -5,6 +5,7 @@ import chan.shop.goodsService.entity.Goods;
 import chan.shop.goodsService.repository.GoodsRepository;
 import chan.shop.goodsService.request.GoodsCreateRequest;
 import chan.shop.goodsService.request.GoodsUpdateRequest;
+import chan.shop.goodsService.response.GoodsPageResponse;
 import chan.shop.goodsService.response.GoodsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,5 +40,17 @@ public class GoodsServiceImpl implements GoodsService {
     @Transactional
     public void delete(Long goodsId) {
         goodsRepository.deleteById(goodsId);
+    }
+
+    public GoodsPageResponse readAll(Long brandId, Long page, Long pageSize) {
+        return GoodsPageResponse.of(
+                goodsRepository.findAll(brandId, (page - 1) * pageSize, pageSize).stream()
+                        .map(GoodsResponse::from)
+                        .toList(),
+                goodsRepository.count(
+                        brandId,
+                        PageLimitCalculator.calculatorPageLimit(page, pageSize, 10L)
+                )
+        );
     }
 }

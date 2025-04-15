@@ -1,6 +1,6 @@
 package chan.shop.goods.api;
 
-import chan.shop.goodsService.request.GoodsCreateRequest;
+import chan.shop.goodsService.response.GoodsPageResponse;
 import chan.shop.goodsService.response.GoodsResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestClient;
 
 public class GoodsApiTest {
-    RestClient restClient = RestClient.create("http://localhost:61461");
+    RestClient restClient = RestClient.create("http://localhost:53620");
 
     @Test
     void createTest() {
@@ -35,6 +35,19 @@ public class GoodsApiTest {
     void deleteTest() {
         restClient.delete().uri("/goods/{goodsId}", 168729130521841664L)
                 .retrieve();
+    }
+
+    @Test
+    void readAllTest() {
+        GoodsPageResponse response = restClient.get()
+                .uri("/goods?brandId=1&page=1&pageSize=30")
+                .retrieve()
+                .body(GoodsPageResponse.class);
+
+        System.out.println("response.getGoodsCount() = " + response.getGoodsCount());
+        for (GoodsResponse goods : response.getGoodsList()) {
+            System.out.println("goods = " + goods);
+        }
     }
 
 

@@ -2,6 +2,7 @@ package chan.shop.goodsService.controller;
 
 import chan.shop.goodsService.request.GoodsCreateRequest;
 import chan.shop.goodsService.request.GoodsUpdateRequest;
+import chan.shop.goodsService.response.GoodsPageResponse;
 import chan.shop.goodsService.response.GoodsResponse;
 import chan.shop.goodsService.service.GoodsService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,11 @@ public class GoodsController {
     @GetMapping("/goods/{goodsId}")
     public GoodsResponse read(@PathVariable Long goodsId) {
         return goodsService.read(goodsId);
+    }
+
+    @GetMapping("/goods")
+    public GoodsPageResponse readAll(@RequestParam("brandId") Long brandId, @RequestParam("page") Long page, @RequestParam("pageSize") Long pageSize) {
+        return goodsService.readAll(brandId, page, pageSize);
     }
 
     @PostMapping("/goods")
