@@ -8,6 +8,8 @@ import chan.shop.goodsService.service.GoodsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class GoodsController {
@@ -21,6 +23,13 @@ public class GoodsController {
     @GetMapping("/goods")
     public GoodsPageResponse readAll(@RequestParam("brandId") Long brandId, @RequestParam("page") Long page, @RequestParam("pageSize") Long pageSize) {
         return goodsService.readAll(brandId, page, pageSize);
+    }
+
+    @GetMapping("/goods/infinite-scroll")
+    public List<GoodsResponse> readAllInfiniteScroll(@RequestParam("brandId") Long brandId,
+                                                     @RequestParam("pageSize") Long pageSize,
+                                                     @RequestParam(value = "lastGoodsId", required = false) Long lastGoodsId) {
+        return goodsService.readAllInfiniteScroll(brandId, pageSize, lastGoodsId);
     }
 
     @PostMapping("/goods")

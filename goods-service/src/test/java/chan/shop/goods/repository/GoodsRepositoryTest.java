@@ -30,4 +30,19 @@ public class GoodsRepositoryTest {
         Long count = goodsRepository.count(1L, 10000L);
         log.info("count = {}", count);
     }
+
+    @Test
+    void findInfiniteScrollTest() {
+        List<Goods> goodsList = goodsRepository.findAllInfiniteScroll(1L, 30L);
+        for (Goods goods : goodsList) {
+            log.info("goodsId = {}", goods.getGoodsId());
+        }
+
+        Long lastGoodsId = goodsList.getLast().getGoodsId();
+        List<Goods> goodsList2 = goodsRepository.findAllInfiniteScroll(1L, 30L, lastGoodsId);
+        for (Goods goods : goodsList2) {
+            log.info("goodsId = {}", goods.getGoodsId());
+        }
+
+    }
 }

@@ -5,11 +5,14 @@ import chan.shop.goodsService.request.GoodsUpdateRequest;
 import chan.shop.goodsService.response.GoodsPageResponse;
 import chan.shop.goodsService.response.GoodsResponse;
 
+import java.util.List;
+
 public interface GoodsService {
 
-    public GoodsResponse create(GoodsCreateRequest request);
-    public GoodsResponse read(Long goodsId);
-    public GoodsResponse update(Long goodsId, GoodsUpdateRequest request);
-    public void delete(Long goodsId);
-    public GoodsPageResponse readAll(Long brandId, Long page, Long pageSize);
+    GoodsResponse create(GoodsCreateRequest request);
+    GoodsResponse read(Long goodsId);
+    GoodsResponse update(Long goodsId, GoodsUpdateRequest request);
+    void delete(Long goodsId);
+    GoodsPageResponse readAll(Long brandId, Long page, Long pageSize);
+    List<GoodsResponse> readAllInfiniteScroll(Long goodsId, Long pageSize, Long lastGoodsId);
 }

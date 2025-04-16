@@ -5,10 +5,13 @@ import chan.shop.goodsService.response.GoodsResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
+
 public class GoodsApiTest {
-    RestClient restClient = RestClient.create("http://localhost:53620");
+    RestClient restClient = RestClient.create("http://localhost:55289");
 
     @Test
     void createTest() {
@@ -47,6 +50,32 @@ public class GoodsApiTest {
         System.out.println("response.getGoodsCount() = " + response.getGoodsCount());
         for (GoodsResponse goods : response.getGoodsList()) {
             System.out.println("goods = " + goods);
+        }
+    }
+
+    @Test
+    void readAllInfiniteScrollTest() {
+        List<GoodsResponse> responses1 = restClient.get()
+                .uri("/goods/infinite-scroll?brandId=1&pageSize=10")
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<GoodsResponse>>() {
+                });
+
+        System.out.println("firstPage");
+        for (GoodsResponse goodsResponse : responses1) {
+            System.out.println("goodsResponse.getGoodsId() = " + goodsResponse.getGoodsId());
+        }
+
+        Long lastGoodsId = responses1.getLast().getGoodsId();
+        List<GoodsResponse> responses2 = restClient.get()
+                .uri("/goods/infinite-scroll?brandId=1&pageSize=10&lastGoodsId=%s".formatted(lastGoodsId))
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<GoodsResponse>>() {
+                });
+
+        System.out.println("secondPage");
+        for (GoodsResponse goodsResponse : responses2) {
+            System.out.println("goodsResponse.getGoodsId() = " + goodsResponse.getGoodsId());
         }
     }
 

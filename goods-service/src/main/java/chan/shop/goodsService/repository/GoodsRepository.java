@@ -34,4 +34,22 @@ public interface GoodsRepository extends JpaRepository<Goods, Long> {
             nativeQuery = true
     )
     Long count(@Param("brandId") Long brandId, @Param("limit") Long limit);
+
+    @Query(
+            value = "select goods.goods_id, goods.goods_title, goods.goods_content, goods.price, goods.qty, goods.brand_id, goods.reg_id, goods.create_at, goods.modified_at " +
+                    "from goods " +
+                    "where brand_id = :brandId " +
+                    "order by goods_id desc limit :limit",
+            nativeQuery = true
+    )
+    List<Goods> findAllInfiniteScroll(@Param("brandId") Long brandId, @Param("limit") Long limit);
+
+    @Query(
+            value = "select goods.goods_id, goods.goods_title, goods.goods_content, goods.price, goods.qty, goods.brand_id, goods.reg_id, goods.create_at, goods.modified_at " +
+                    "from goods " +
+                    "where brand_id = :brandId and goods_id < :lastGoodsId " +
+                    "order by goods_id desc limit :limit",
+            nativeQuery = true
+    )
+    List<Goods> findAllInfiniteScroll(@Param("brandId") Long brandId, @Param("limit") Long limit, @Param("lastGoodsId") Long lastGoodsId);
 }
