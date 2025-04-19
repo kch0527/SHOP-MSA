@@ -14,7 +14,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "   select comment_id from comment " +
             "   where goods_id = :goodsId and parent_comment_id = :parentCommentId " +
             "   limit :limit" +
-            ")",
+            ") c",
             nativeQuery = true
     )
     Long countBy(@Param("goodsId") Long goodsId, @Param("parentCommentId") Long parentCommentId, @Param("limit") Long limit);

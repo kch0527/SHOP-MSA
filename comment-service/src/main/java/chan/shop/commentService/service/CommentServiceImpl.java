@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.function.Predicate;
+import static java.util.function.Predicate.not;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +38,7 @@ public class CommentServiceImpl implements CommentService{
             return null;
         }
         return commentRepository.findById(parentCommentId)
-                .filter(Predicate.not(Comment::getDeleted))
+                .filter(not(Comment::getDeleted))
                 .filter(Comment::isRoot)
                 .orElseThrow();
     }
@@ -52,7 +52,7 @@ public class CommentServiceImpl implements CommentService{
     @Transactional
     public void delete(Long commentId) {
         commentRepository.findById(commentId)
-                .filter(Predicate.not(Comment::getDeleted))
+                .filter(not(Comment::getDeleted))
                 .ifPresent(comment -> {
                     if(hasChildren(comment)) {
                         comment.delete();
@@ -71,7 +71,7 @@ public class CommentServiceImpl implements CommentService{
         if(!comment.isRoot()) {
             commentRepository.findById(comment.getParentCommentId())
                     .filter(Comment::getDeleted)
-                    .filter(Predicate.not(this::hasChildren))
+                    .filter(not(this::hasChildren))
                     .ifPresent(this::delete);
         }
     }

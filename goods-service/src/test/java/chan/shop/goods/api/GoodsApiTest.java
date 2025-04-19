@@ -38,6 +38,7 @@ public class GoodsApiTest {
     void deleteTest() {
         restClient.delete().uri("/goods/{goodsId}", 168729130521841664L)
                 .retrieve();
+        //.toBodilessEntity();
     }
 
     @Test
