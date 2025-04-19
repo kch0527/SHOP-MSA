@@ -3,11 +3,14 @@ package chan.shop.commentService.service;
 import chan.shop.commentService.entity.Comment;
 import chan.shop.commentService.repository.CommentRepository;
 import chan.shop.commentService.request.CommentCreateRequest;
+import chan.shop.commentService.response.CommentPageResponse;
 import chan.shop.commentService.response.CommentResponse;
 import chan.shop.commonservice.snowflake.Snowflake;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static java.util.function.Predicate.not;
 
@@ -47,6 +50,25 @@ public class CommentServiceImpl implements CommentService{
         return CommentResponse.from(
                 commentRepository.findById(commentId).orElseThrow()
         );
+    }
+
+    public CommentPageResponse readAll(Long goodsId, Long page, Long pageSize) {
+        return CommentPageResponse.of(
+                commentRepository.findAll(goodsId, (page - 1) * pageSize, pageSize).stream()
+                        .map(CommentResponse::from)
+                        .toList(),
+                commentRepository.count(goodsId, PageLimitCalculator.calculatorPageLimit(page, pageSize, 10L))
+        );
+    }
+
+    public List<CommentResponse> readAll(Long goodsId, Long lastParentCommentId, Long lastCommentId, Long limit) {
+        List<Comment> comments = lastParentCommentId == null || lastCommentId == null ?
+                commentRepository.findAllInfiniteScroll(goodsId, limit) :
+                commentRepository.findAllInfiniteScroll(goodsId, lastParentCommentId, lastCommentId, limit);
+
+        return comments.stream()
+                .map(CommentResponse::from)
+                .toList();
     }
 
     @Transactional
