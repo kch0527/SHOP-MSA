@@ -11,7 +11,7 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 
 public class GoodsApiTest {
-    RestClient restClient = RestClient.create("http://localhost:55289");
+    RestClient restClient = RestClient.create("http://localhost:56946");
 
     @Test
     void createTest() {
@@ -102,6 +102,28 @@ public class GoodsApiTest {
                 .body(new GoodsUpdateRequest("test1", "test", 2000L, 50L))
                 .retrieve()
                 .body(GoodsResponse.class);
+    }
+
+    @Test
+    void countTest() {
+        GoodsResponse response = create(new GoodsCreateRequest("test1", "test1", 3000L, 10L, 3L, 1L));
+
+        Long count1 = restClient.get()
+                .uri("/goods/brand/{brandId}/count", response.getBrandId())
+                .retrieve()
+                .body(Long.class);
+        System.out.println("count : " + count1);
+
+        restClient.delete()
+                .uri("/goods/{goodsId}", response.getGoodsId())
+                .retrieve()
+                .toBodilessEntity();
+
+        Long count2 = restClient.get()
+                .uri("/goods/brand/{brandId}/count", response.getBrandId())
+                .retrieve()
+                .body(Long.class);
+        System.out.println("count : " + count2);
     }
 
     @Getter

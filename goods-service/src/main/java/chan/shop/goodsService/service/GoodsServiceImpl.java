@@ -1,7 +1,9 @@
 package chan.shop.goodsService.service;
 
 import chan.shop.commonservice.snowflake.Snowflake;
+import chan.shop.goodsService.entity.BrandGoodsCount;
 import chan.shop.goodsService.entity.Goods;
+import chan.shop.goodsService.repository.BrandGoodsCountRepository;
 import chan.shop.goodsService.repository.GoodsRepository;
 import chan.shop.goodsService.request.GoodsCreateRequest;
 import chan.shop.goodsService.request.GoodsUpdateRequest;
@@ -12,12 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class GoodsServiceImpl implements GoodsService {
     private final Snowflake snowflake = new Snowflake();
     private final GoodsRepository goodsRepository;
+    private final BrandGoodsCountRepository brandGoodsCountRepository;
 
     @Transactional
     public GoodsResponse create(GoodsCreateRequest request) {
@@ -25,6 +29,12 @@ public class GoodsServiceImpl implements GoodsService {
                 Goods.create(snowflake.nextId(), request.getGoodsTitle(), request.getGoodsContent(), request.getPrice(), request.getQty(),
                         request.getBrandId(), request.getRegId())
         );
+        int result = brandGoodsCountRepository.increase(request.getBrandId());
+        if(result == 0) {
+            brandGoodsCountRepository.save(
+                    BrandGoodsCount.init(request.getBrandId(), 1L)
+            );
+        }
         return GoodsResponse.from(goods);
     }
 
@@ -41,7 +51,9 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Transactional
     public void delete(Long goodsId) {
-        goodsRepository.deleteById(goodsId);
+        Goods goods = goodsRepository.findById(goodsId).orElseThrow();
+        goodsRepository.delete(goods);
+        brandGoodsCountRepository.decrease(goods.getBrandId());
     }
 
     public GoodsPageResponse readAll(Long brandId, Long page, Long pageSize) {
@@ -61,5 +73,11 @@ public class GoodsServiceImpl implements GoodsService {
                 goodsRepository.findAllInfiniteScroll(goodsId, pageSize) :
                 goodsRepository.findAllInfiniteScroll(goodsId, pageSize, lastGoodsId);
         return goods.stream().map(GoodsResponse::from).toList();
+    }
+
+    public Long count(Long brandId) {
+        return brandGoodsCountRepository.findById(brandId)
+                .map(BrandGoodsCount::getGoodsCount)
+                .orElse(0L);
     }
 }

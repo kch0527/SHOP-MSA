@@ -15,4 +15,5 @@ public interface GoodsService {
     void delete(Long goodsId);
     GoodsPageResponse readAll(Long brandId, Long page, Long pageSize);
     List<GoodsResponse> readAllInfiniteScroll(Long goodsId, Long pageSize, Long lastGoodsId);
+    Long count(Long brandId);
 }

@@ -46,4 +46,9 @@ public class GoodsController {
     public void delete(@PathVariable Long goodsId) {
         goodsService.delete(goodsId);
     }
+
+    @GetMapping("/goods/brand/{brandId}/count")
+    public Long count(@PathVariable Long brandId) {
+        return goodsService.count(brandId);
+    }
 }
