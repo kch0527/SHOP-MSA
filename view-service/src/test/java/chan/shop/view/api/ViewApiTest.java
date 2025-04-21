@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ViewApiTest {
-    RestClient restClient = RestClient.create("http://localhost:64810");
+    RestClient restClient = RestClient.create("http://localhost:55125");
 
     @Test
     void viewTest() throws InterruptedException {
@@ -18,7 +18,7 @@ public class ViewApiTest {
         for(int i = 0; i < 10000; i++) {
             executorService.submit(() -> {
                 restClient.post()
-                        .uri("/goods-view/goods/{goodsId}/user/{userId}", 4L, 1L)
+                        .uri("/goods-view/goods/{goodsId}/user/{userId}", 3L, 1L)
                         .retrieve()
                         .toBodilessEntity();
                 countDownLatch.countDown();
@@ -27,7 +27,7 @@ public class ViewApiTest {
         countDownLatch.await();
 
         Long count = restClient.get()
-                .uri("/goods-view/goods/{goodsId}/count", 4L)
+                .uri("/goods-view/goods/{goodsId}/count", 3L)
                 .retrieve()
                 .body(Long.class);
 
