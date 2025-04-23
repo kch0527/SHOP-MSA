@@ -39,9 +39,9 @@ public class EventTest {
         // then
         assertThat(result.getEventId()).isEqualTo(event.getEventId());
         assertThat(result.getType()).isEqualTo(event.getType());
-        assertThat(result.getPayLoad()).isInstanceOf(payload.getClass());
+        assertThat(result.getPayload()).isInstanceOf(payload.getClass());
 
-        GoodsCreatedEventPayload resultPayload = (GoodsCreatedEventPayload) result.getPayLoad();
+        GoodsCreatedEventPayload resultPayload = (GoodsCreatedEventPayload) result.getPayload();
         assertThat(resultPayload.getGoodsId()).isEqualTo(payload.getGoodsId());
         assertThat(resultPayload.getGoodsTitle()).isEqualTo(payload.getGoodsTitle());
         assertThat(resultPayload.getCreateAt()).isEqualTo(payload.getCreateAt());

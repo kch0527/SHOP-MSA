@@ -7,13 +7,13 @@ import lombok.Getter;
 public class Event<T extends EventPayload> { //event 통신을 위한 class
     private Long eventId;
     private EventType type;
-    private T payLoad;
+    private T payload;
 
     public static Event<EventPayload> of (Long eventId, EventType type, EventPayload payload) {
         Event<EventPayload> event = new Event<>();
         event.eventId = eventId;
         event.type = type;
-        event.payLoad = payload;
+        event.payload = payload;
         return event;
     }
 
@@ -32,7 +32,7 @@ public class Event<T extends EventPayload> { //event 통신을 위한 class
         Event<EventPayload> event = new Event<>();
         event.eventId = eventRaw.getEventId();
         event.type = EventType.from(eventRaw.getType());
-        event.payLoad = DataSerializer.deserialize(eventRaw.getPayload(),event.type.getPayloadClass());
+        event.payload = DataSerializer.deserialize(eventRaw.getPayload(),event.type.getPayloadClass());
         return event;
     }
 
