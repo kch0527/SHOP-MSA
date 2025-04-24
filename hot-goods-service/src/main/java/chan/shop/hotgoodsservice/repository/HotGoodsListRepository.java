@@ -34,6 +34,10 @@ public class HotGoodsListRepository {
         });
     }
 
+    public void remove(Long goodsId, LocalDateTime time) {
+        redisTemplate.opsForZSet().remove(generateKey(time), String.valueOf(goodsId));
+    }
+
     private String generateKey(LocalDateTime time) {
         return generateKey(TIME_FORMATTER.format(time));
     }
