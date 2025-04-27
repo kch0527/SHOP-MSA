@@ -3,6 +3,7 @@ rootProject.name = 'shop'
 include 'common-service:snowflake'
 include 'common-service:data-serializer'
 include 'common-service:event'
+include 'common-service:outbox-message-relay'
 
 include 'eureka-server'
 include 'config-server'
