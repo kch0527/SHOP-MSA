@@ -1,6 +1,11 @@
 package chan.shop.goodsService.service;
 
+import chan.shop.commonservice.outboxmessagerelay.OutboxEventPublisher;
 import chan.shop.commonservice.snowflake.Snowflake;
+import chan.shop.event.EventType;
+import chan.shop.event.payload.GoodsCreatedEventPayload;
+import chan.shop.event.payload.GoodsDeletedEventPayload;
+import chan.shop.event.payload.GoodsUpdatedEventPayload;
 import chan.shop.goodsService.entity.BrandGoodsCount;
 import chan.shop.goodsService.entity.Goods;
 import chan.shop.goodsService.repository.BrandGoodsCountRepository;
@@ -22,6 +27,7 @@ public class GoodsServiceImpl implements GoodsService {
     private final Snowflake snowflake = new Snowflake();
     private final GoodsRepository goodsRepository;
     private final BrandGoodsCountRepository brandGoodsCountRepository;
+    private final OutboxEventPublisher outboxEventPublisher;
 
     @Transactional
     public GoodsResponse create(GoodsCreateRequest request) {
@@ -35,6 +41,24 @@ public class GoodsServiceImpl implements GoodsService {
                     BrandGoodsCount.init(request.getBrandId(), 1L)
             );
         }
+
+        outboxEventPublisher.publish(
+                EventType.GOODS_CREATED,
+                GoodsCreatedEventPayload.builder()
+                        .goodsId(goods.getGoodsId())
+                        .goodsTitle(goods.getGoodsTitle())
+                        .goodsContent(goods.getGoodsContent())
+                        .price(goods.getPrice())
+                        .qty(goods.getQty())
+                        .brandId(goods.getBrandId())
+                        .regId(goods.getRegId())
+                        .createAt(goods.getCreateAt())
+                        .modifiedAt(goods.getModifiedAt())
+                        .brandGoodsCount(count(goods.getBrandId()))
+                        .build(),
+                goods.getBrandId()
+        );
+
         return GoodsResponse.from(goods);
     }
 
@@ -42,6 +66,23 @@ public class GoodsServiceImpl implements GoodsService {
     public GoodsResponse update(Long goodsId, GoodsUpdateRequest request) {
         Goods goods = goodsRepository.findById(goodsId).orElseThrow();
         goods.update(request.getGoodsTitle(), request.getGoodsContent(), request.getPrice(), request.getQty());
+
+        outboxEventPublisher.publish(
+                EventType.GOODS_UPDATED,
+                GoodsUpdatedEventPayload.builder()
+                        .goodsId(goods.getGoodsId())
+                        .goodsTitle(goods.getGoodsTitle())
+                        .goodsContent(goods.getGoodsContent())
+                        .price(goods.getPrice())
+                        .qty(goods.getQty())
+                        .brandId(goods.getBrandId())
+                        .regId(goods.getRegId())
+                        .createAt(goods.getCreateAt())
+                        .modifiedAt(goods.getModifiedAt())
+                        .build(),
+                goods.getBrandId()
+        );
+
         return GoodsResponse.from(goods);
     }
 
@@ -54,6 +95,23 @@ public class GoodsServiceImpl implements GoodsService {
         Goods goods = goodsRepository.findById(goodsId).orElseThrow();
         goodsRepository.delete(goods);
         brandGoodsCountRepository.decrease(goods.getBrandId());
+
+        outboxEventPublisher.publish(
+                EventType.GOODS_DELETED,
+                GoodsDeletedEventPayload.builder()
+                        .goodsId(goods.getGoodsId())
+                        .goodsTitle(goods.getGoodsTitle())
+                        .goodsContent(goods.getGoodsContent())
+                        .price(goods.getPrice())
+                        .qty(goods.getQty())
+                        .brandId(goods.getBrandId())
+                        .regId(goods.getRegId())
+                        .createAt(goods.getCreateAt())
+                        .modifiedAt(goods.getModifiedAt())
+                        .brandGoodsCount(count(goods.getBrandId()))
+                        .build(),
+                goods.getBrandId()
+        );
     }
 
     public GoodsPageResponse readAll(Long brandId, Long page, Long pageSize) {

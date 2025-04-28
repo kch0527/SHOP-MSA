@@ -12,9 +12,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @Component
 @Slf4j
@@ -53,7 +51,7 @@ public class MessageRelay {
             fixedDelay = 10,
             initialDelay = 5,
             timeUnit = TimeUnit.SECONDS,
-            scheduler = "messageRelayPublisthPendingEventExecutor"
+            scheduler = "messageRelayPublishPendingEventExecutor"
     )
     public void publishPendingEvent() {
         AssignedShard assignedShard = messageRelayCoordinator.assignedShard();

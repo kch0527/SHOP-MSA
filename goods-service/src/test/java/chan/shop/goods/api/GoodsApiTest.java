@@ -11,7 +11,7 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 
 public class GoodsApiTest {
-    RestClient restClient = RestClient.create("http://localhost:56946");
+    RestClient restClient = RestClient.create("http://localhost:54036");
 
     @Test
     void createTest() {

@@ -47,7 +47,7 @@ public class MessageRelayConfig {
     }
 
     @Bean
-    public Executor messageRelayPublisthPendingEventExecutor() {
+    public Executor messageRelayPublishPendingEventExecutor() {
         return Executors.newSingleThreadScheduledExecutor(); // 싱글 스레드로 미전송 이벤트 전송
     }
 

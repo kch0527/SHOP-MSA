@@ -1,5 +1,8 @@
 package chan.shop.viewservice.service;
 
+import chan.shop.commonservice.outboxmessagerelay.OutboxEventPublisher;
+import chan.shop.event.EventType;
+import chan.shop.event.payload.GoodsViewEventPayload;
 import chan.shop.viewservice.entity.GoodsViewCount;
 import chan.shop.viewservice.repository.GoodsViewCountBackUpRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GoodsViewCountBackUpProcessor {
     private final GoodsViewCountBackUpRepository goodsViewCountBackUpRepository;
+    private final OutboxEventPublisher outboxEventPublisher;
 
     @Transactional
     public void backUp(Long goodsId, Long viewCount) {
@@ -21,5 +25,14 @@ public class GoodsViewCountBackUpProcessor {
                                     GoodsViewCount.init(goodsId, viewCount)
                             ));
         }
+
+        outboxEventPublisher.publish(
+                EventType.GOODS_VIEWED,
+                GoodsViewEventPayload.builder()
+                        .goodsId(goodsId)
+                        .goodsViewCount(viewCount)
+                        .build(),
+                goodsId
+        );
     }
 }

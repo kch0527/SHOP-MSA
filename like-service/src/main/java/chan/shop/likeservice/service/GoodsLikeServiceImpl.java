@@ -1,6 +1,10 @@
 package chan.shop.likeservice.service;
 
+import chan.shop.commonservice.outboxmessagerelay.OutboxEventPublisher;
 import chan.shop.commonservice.snowflake.Snowflake;
+import chan.shop.event.EventType;
+import chan.shop.event.payload.GoodsLikeEventPayload;
+import chan.shop.event.payload.GoodsUnlikeEventPayload;
 import chan.shop.likeservice.entity.GoodsLike;
 import chan.shop.likeservice.entity.GoodsLikeCount;
 import chan.shop.likeservice.repository.GoodsLikeCountRepository;
@@ -16,6 +20,7 @@ public class GoodsLikeServiceImpl implements GoodsLikeService{
     private final Snowflake snowflake = new Snowflake();
     private final GoodsLikeRepository goodsLikeRepository;
     private final GoodsLikeCountRepository goodsLikeCountRepository;
+    private final OutboxEventPublisher outboxEventPublisher;
 
     public GoodsLikeResponse read(Long goodsId, Long userId) {
         return goodsLikeRepository.findByGoodsIdAndUserId(goodsId, userId)
@@ -28,7 +33,7 @@ public class GoodsLikeServiceImpl implements GoodsLikeService{
      */
     @Transactional
     public void likePessimisticLock1(Long goodsId, Long userId) {
-        goodsLikeRepository.save(
+        GoodsLike goodsLike = goodsLikeRepository.save(
                 GoodsLike.create(
                         snowflake.nextId(),
                         goodsId,
@@ -41,6 +46,18 @@ public class GoodsLikeServiceImpl implements GoodsLikeService{
                     GoodsLikeCount.init(goodsId, 1L)
             );
         }
+
+        outboxEventPublisher.publish(
+                EventType.GOODS_LIKED,
+                GoodsLikeEventPayload.builder()
+                        .goodsLikeId(goodsLike.getGoodsLikeId())
+                        .goodsId(goodsLike.getGoodsId())
+                        .userId(goodsLike.getUserId())
+                        .createAt(goodsLike.getCreateAt())
+                        .goodsLikeCount(count(goodsLike.getGoodsId()))
+                        .build(),
+                goodsLike.getGoodsId()
+        );
     }
 
     @Transactional
@@ -49,6 +66,18 @@ public class GoodsLikeServiceImpl implements GoodsLikeService{
                 .ifPresent(goodsLike -> {
                     goodsLikeRepository.delete(goodsLike);
                     goodsLikeCountRepository.decrease(goodsId);
+
+                    outboxEventPublisher.publish(
+                            EventType.GOODS_UNLIKED,
+                            GoodsUnlikeEventPayload.builder()
+                                    .goodsLikeId(goodsLike.getGoodsLikeId())
+                                    .goodsId(goodsLike.getGoodsId())
+                                    .userId(goodsLike.getUserId())
+                                    .createAt(goodsLike.getCreateAt())
+                                    .goodsLikeCount(count(goodsLike.getGoodsId()))
+                                    .build(),
+                            goodsLike.getGoodsId()
+                    );
                 });
     }
 
