@@ -14,7 +14,7 @@ spring:
       enable-auto-commit: false
 endpoints:
   goods-service:
-    url: http://goods-service
+    url: http://localhost:62180
 
 server:
   port: 0

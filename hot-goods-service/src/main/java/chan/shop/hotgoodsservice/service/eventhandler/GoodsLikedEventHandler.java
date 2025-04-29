@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class GoodsLikedEventHandler implements EventHandler<GoodsLikeEventPayload>{
-    private GoodsLikeCountRepository goodsLikeCountRepository;
+    private final GoodsLikeCountRepository goodsLikeCountRepository;
 
     @Override
     public void handle(Event<GoodsLikeEventPayload> event) {

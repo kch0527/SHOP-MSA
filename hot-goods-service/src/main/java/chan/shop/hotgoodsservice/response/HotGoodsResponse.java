@@ -2,10 +2,12 @@ package chan.shop.hotgoodsservice.response;
 
 import chan.shop.hotgoodsservice.client.GoodsClient;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Getter
+@ToString
 public class HotGoodsResponse {
     private Long goodsId;
     private String goodsTitle;
