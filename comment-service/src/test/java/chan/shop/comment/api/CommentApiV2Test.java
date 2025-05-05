@@ -11,7 +11,7 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 
 public class CommentApiV2Test {
-    RestClient restClient = RestClient.create("http://localhost:55452");
+    RestClient restClient = RestClient.create("http://localhost:55892");
 
     @Test
     void create() {
@@ -99,6 +99,28 @@ public class CommentApiV2Test {
         for (CommentResponse response : response2) {
             System.out.println("response.getCommentId() = " + response.getCommentId());
         }
+    }
+
+    @Test
+    void countTest() {
+        CommentResponse response = create(new CommentCreateRequestV2(2L, "comment", null, 1L));
+
+        Long count1 = restClient.get()
+                .uri("/v2/comments/goods/{goodsId}/count", response.getGoodsId())
+                .retrieve()
+                .body(Long.class);
+        System.out.println("count1 = " + count1); // 1
+
+        restClient.delete()
+                .uri("/v2/comments/{commentId}", response.getCommentId())
+                .retrieve()
+                .toBodilessEntity();
+
+        Long count2 = restClient.get()
+                .uri("/v2/comments/goods/{goodsId}/count", response.getGoodsId())
+                .retrieve()
+                .body(Long.class);
+        System.out.println("count2 = " + count2); // 0
     }
 
     @Getter

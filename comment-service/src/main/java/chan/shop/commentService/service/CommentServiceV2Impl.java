@@ -3,7 +3,9 @@ package chan.shop.commentService.service;
 import chan.shop.commentService.entity.Comment;
 import chan.shop.commentService.entity.CommentPath;
 import chan.shop.commentService.entity.CommentV2;
+import chan.shop.commentService.entity.GoodsCommentCount;
 import chan.shop.commentService.repository.CommentRepositoryV2;
+import chan.shop.commentService.repository.GoodsCommentCountRepository;
 import chan.shop.commentService.request.CommentCreateRequestV2;
 import chan.shop.commentService.response.CommentPageResponse;
 import chan.shop.commentService.response.CommentResponse;
@@ -22,6 +24,7 @@ import static java.util.function.Predicate.*;
 public class CommentServiceV2Impl {
     private final Snowflake snowflake = new Snowflake();
     private final CommentRepositoryV2 commentRepository;
+    private final GoodsCommentCountRepository goodsCommentCountRepository;
 
     @Transactional
     public CommentResponse create(CommentCreateRequestV2 request) {
@@ -39,6 +42,13 @@ public class CommentServiceV2Impl {
                         )
                 )
         );
+
+        int result = goodsCommentCountRepository.increase(request.getGoodsId());
+        if (result == 0) {
+            goodsCommentCountRepository.save(
+                    GoodsCommentCount.init(request.getGoodsId(), 1L)
+            );
+        }
 
         return CommentResponse.from(comment);
     }
@@ -81,6 +91,9 @@ public class CommentServiceV2Impl {
 
     private void delete(CommentV2 comment) {
         commentRepository.delete(comment);
+
+        goodsCommentCountRepository.decrease(comment.getGoodsId());
+
         if(!comment.isRoot()) {
             commentRepository.findByPath(comment.getCommentPath().getParentPath())
                     .filter(CommentV2::getDeleted)
@@ -106,5 +119,11 @@ public class CommentServiceV2Impl {
         return comments.stream()
                 .map(CommentResponse::from)
                 .toList();
+    }
+
+    public Long count(Long goodsId) {
+        return goodsCommentCountRepository.findById(goodsId)
+                .map(GoodsCommentCount::getCommentCount)
+                .orElse(0L);
     }
 }
