@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,5 +24,61 @@ public interface CommentRepositoryV2 extends JpaRepository<CommentV2, Long> {
     Optional<String> findDescendantsTopPath(
             @Param("goodsId") Long goodsId,
             @Param("pathPrefix") String pathPrefix
+    );
+
+    @Query(
+            value = "select comment_v2.comment_id, comment_v2.content, comment_v2.path, comment_v2.goods_id, " +
+                    "comment_v2.reg_id, comment_v2.deleted, comment_v2.create_at " +
+                    "from (" +
+                    "   select comment_id from comment_v2 where goods_id = :goodsId" +
+                    "   order by path asc" +
+                    "   limit :limit offset :offset" +
+                    ") t left join comment_v2 on t.comment_id = comment_v2.comment_id",
+            nativeQuery = true
+    )
+    List<CommentV2> findAll(
+            @Param("goodsId") Long goodsId,
+            @Param("offset") Long offset,
+            @Param("limit") Long limit
+    );
+
+    @Query(
+            value = "select count(*) from (" +
+                    "   select comment_id from comment_v2 where goods_id = :goodsId limit :limit" +
+                    ") t",
+            nativeQuery = true
+    )
+    Long count(
+            @Param("goodsId") Long goodsId,
+            @Param("limit") Long limit
+    );
+
+    @Query(
+            value = "select comment_v2.comment_id, comment_v2.content, comment_v2.path, comment_v2.goods_id, " +
+                    "comment_v2.reg_id, comment_v2.deleted, comment_v2.create_at " +
+                    "from comment_v2 " +
+                    "where goods_id = :goodsId " +
+                    "order by path asc " +
+                    "limit :limit ",
+            nativeQuery = true
+    )
+    List<CommentV2> findAllInfiniteScroll(
+            @Param("goodsId") Long goodsId,
+            @Param("limit") Long limit
+    );
+
+    @Query(
+            value = "select comment_v2.comment_id, comment_v2.content, comment_v2.path, comment_v2.goods_id, " +
+                    "comment_v2.reg_id, comment_v2.deleted, comment_v2.create_at " +
+                    "from comment_v2 " +
+                    "where goods_id = :goodsId and path > :lastPath " +
+                    "order by path asc " +
+                    "limit :limit",
+            nativeQuery = true
+    )
+    List<CommentV2> findAllInfiniteScroll(
+            @Param("goodsId") Long goodsId,
+            @Param("lastPath") String lastPath,
+            @Param("limit") Long limit
     );
 }

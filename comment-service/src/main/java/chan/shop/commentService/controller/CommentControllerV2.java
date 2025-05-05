@@ -31,5 +31,21 @@ public class CommentControllerV2 {
         commentService.delete(commentId);
     }
 
+    @GetMapping("/v2/comments")
+    public CommentPageResponse readAll(
+            @RequestParam("goodsId") Long goodsId,
+            @RequestParam("page") Long page,
+            @RequestParam("pageSize") Long pageSize
+    ) {
+        return commentService.readAll(goodsId, page, pageSize);
+    }
 
+    @GetMapping("/v2/comments/infinite-scroll")
+    public List<CommentResponse> readAll(
+            @RequestParam("goodsId") Long goodsId,
+            @RequestParam(value = "lastPath", required = false) String lastPath,
+            @RequestParam("pageSize") Long pageSize
+    ) {
+        return commentService.readAllInfiniteScroll(goodsId, lastPath, pageSize);
+    }
 }

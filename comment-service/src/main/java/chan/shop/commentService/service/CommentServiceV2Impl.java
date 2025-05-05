@@ -5,12 +5,14 @@ import chan.shop.commentService.entity.CommentPath;
 import chan.shop.commentService.entity.CommentV2;
 import chan.shop.commentService.repository.CommentRepositoryV2;
 import chan.shop.commentService.request.CommentCreateRequestV2;
+import chan.shop.commentService.response.CommentPageResponse;
 import chan.shop.commentService.response.CommentResponse;
 import chan.shop.commonservice.snowflake.Snowflake;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.*;
@@ -85,5 +87,24 @@ public class CommentServiceV2Impl {
                     .filter(not(this::hasChildren))
                     .ifPresent(this::delete);
         }
+    }
+
+    public CommentPageResponse readAll(Long goodsId, Long page, Long pageSize) {
+        return CommentPageResponse.of(
+                commentRepository.findAll(goodsId, (page - 1) * pageSize, pageSize).stream()
+                        .map(CommentResponse::from)
+                        .toList(),
+                commentRepository.count(goodsId, PageLimitCalculator.calculatorPageLimit(page, pageSize, 10L))
+        );
+    }
+
+    public List<CommentResponse> readAllInfiniteScroll(Long goodsId, String lastPath, Long pageSize) {
+        List<CommentV2> comments = lastPath == null ?
+                commentRepository.findAllInfiniteScroll(goodsId, pageSize) :
+                commentRepository.findAllInfiniteScroll(goodsId, lastPath, pageSize);
+
+        return comments.stream()
+                .map(CommentResponse::from)
+                .toList();
     }
 }
