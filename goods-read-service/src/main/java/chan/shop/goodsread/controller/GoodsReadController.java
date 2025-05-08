@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GoodsReadController {
     private final GoodsReadService goodsReadService;
 
-    @GetMapping("/goods/{goods}")
+    @GetMapping("/goods/{goodsId}")
     public GoodsReadResponse read(@PathVariable("goodsId") Long goodsId) {
         return goodsReadService.read(goodsId);
     }
