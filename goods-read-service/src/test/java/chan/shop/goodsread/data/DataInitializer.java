@@ -8,9 +8,9 @@ import org.springframework.web.client.RestClient;
 import java.util.random.RandomGenerator;
 
 public class DataInitializer {
-    RestClient goodsRestClient = RestClient.create("http://localhost:61225");
-    RestClient likeRestClient = RestClient.create("http://localhost:61248");
-    RestClient viewRestClient = RestClient.create("http://localhost:61269");
+    RestClient goodsRestClient = RestClient.create("http://localhost:64221");
+    RestClient likeRestClient = RestClient.create("http://localhost:63784");
+    RestClient viewRestClient = RestClient.create("http://localhost:63803");
 
     @Test
     void initialize() {

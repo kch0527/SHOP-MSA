@@ -6,7 +6,15 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.function.Function.*;
+import static java.util.stream.Collectors.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -41,5 +49,13 @@ public class GoodsQueryModelRepository {
 
     private String generateKey(Long goodsId) {
         return KEY_FORMAT.formatted(goodsId);
+    }
+
+    public Map<Long, GoodsQueryModel> readAll(List<Long> goodsIds) {
+        List<String> keyList = goodsIds.stream().map(this::generateKey).toList();
+        return redisTemplate.opsForValue().multiGet(keyList).stream()
+                .filter(Objects::nonNull)
+                .map(json -> DataSerializer.deserialize(json, GoodsQueryModel.class))
+                .collect(toMap(GoodsQueryModel::getGoodsId, identity()));
     }
 }

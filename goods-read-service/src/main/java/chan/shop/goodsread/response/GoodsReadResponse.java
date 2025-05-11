@@ -23,7 +23,7 @@ public class GoodsReadResponse {
     private Long goodsLikeCount;
     private Long goodsViewCount;
 
-    public static GoodsReadResponse form(GoodsQueryModel goodsQueryModel, Long viewCount) {
+    public static GoodsReadResponse from(GoodsQueryModel goodsQueryModel, Long viewCount) {
         GoodsReadResponse response = new GoodsReadResponse();
         response.goodsId = goodsQueryModel.getGoodsId();
         response.goodsTitle = goodsQueryModel.getGoodsTitle();

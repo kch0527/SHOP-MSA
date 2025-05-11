@@ -3,6 +3,8 @@ package chan.shop.goodsread.service.event.handler;
 import chan.shop.event.Event;
 import chan.shop.event.EventType;
 import chan.shop.event.payload.GoodsCreatedEventPayload;
+import chan.shop.goodsread.repository.BrandGoodsCountRepository;
+import chan.shop.goodsread.repository.GoodsIdListRepository;
 import chan.shop.goodsread.repository.GoodsQueryModel;
 import chan.shop.goodsread.repository.GoodsQueryModelRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,8 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class GoodsCreateEventHandler implements EventHandler<GoodsCreatedEventPayload>{
     private final GoodsQueryModelRepository goodsQueryModelRepository;
+    private final GoodsIdListRepository goodsIdListRepository;
+    private final BrandGoodsCountRepository brandGoodsCountRepository;
 
     @Override
     public void handle(Event<GoodsCreatedEventPayload> event) {
@@ -22,6 +26,8 @@ public class GoodsCreateEventHandler implements EventHandler<GoodsCreatedEventPa
                 GoodsQueryModel.create(payload),
                 Duration.ofDays(1)
         );
+        goodsIdListRepository.add(payload.getBrandId(), payload.getGoodsId(), 1000L);
+        brandGoodsCountRepository.createOrUpdate(payload.getBrandId(), payload.getBrandGoodsCount());
     }
 
     @Override
