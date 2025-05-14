@@ -1,5 +1,6 @@
 package chan.shop.goodsread.client;
 
+import chan.shop.goodsread.cache.OptimizedCacheable;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,8 @@ public class ViewClient {
     // 2. redis에 데이터가 없었다면, count 메서드 내부 로직이 호출되면서 viewService로 원본 데이터를 요청
     // 3. redis에 데이터를 넣고 응답
     // 4. 만약 redis에 데이터가 있었다면, 그 데이터를 그대로 바로 반환
-    @Cacheable(key = "#goodsId", value = "goodsViewCount")
+    // @Cacheable(key = "#goodsId", value = "goodsViewCount") / 25.05.14 > @OptimizedCacheable 변경
+    @OptimizedCacheable(type = "goodsViewCount", ttlSeconds = 1)
     public long count(Long goodsId) {
         log.info("[ViewClient.count] goodsId={}", goodsId);
         try{
