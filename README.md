@@ -44,3 +44,6 @@ MSA 아키텍처 학습을 위한 쇼핑몰 토이 프로젝트 입니다.
 - goods-read-service
   - 상품 조회 전용 API(CQRS Pattern)
   - Redis 캐시 + 캐시 최적화(Request Collapsing)
+- coupon-service (05.19 ~ ing)
+  - 선착순 쿠폰 발급 이벤트 시스템 (05.19 ~ ing)
+  - 선착순 1000명, 1인 1발급 (05.19 ~ ing)
