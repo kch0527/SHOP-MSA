@@ -5,5 +5,5 @@ import chan.shop.couponservice.request.CouponCreateRequest;
 public interface CouponService {
 
     void create(CouponCreateRequest request);
-    String generateCouponCode();
+    Long count();
 }

@@ -24,10 +24,11 @@ public class CouponServiceImpl implements CouponService{
     private static final String CHAR_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     public void create(CouponCreateRequest request) {
-        Long count = couponCountRepository.increase();
 
-        if (count > 1000) {
-            return;
+        boolean tryCreateCoupon = couponCountRepository.createCoupon(request.getUserId());
+
+        if(!tryCreateCoupon) {
+            throw new IllegalStateException("Coupon issuance failed.");
         }
 
         couponRepository.save(
@@ -35,7 +36,11 @@ public class CouponServiceImpl implements CouponService{
         );
     }
 
-    public String generateCouponCode() {
+    public Long count() {
+        return couponCountRepository.read();
+    }
+
+    private String generateCouponCode() {
         StringBuilder sb = new StringBuilder(PREFIX).append("-");
         for (int i = 0; i < CODE_LENGTH; i++) {
             int idx = RANDOM.nextInt(CHAR_POOL.length());
